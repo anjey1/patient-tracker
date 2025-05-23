@@ -9,6 +9,8 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 const app: Express = express();
+
+app.set('trust proxy', 1);
 app.use(cors());
 app.use(express.json());
 
