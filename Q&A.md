@@ -70,3 +70,5 @@ patient-tracker-app/
 - Add comprehensive logging
 - Enhance AI model flexibility
 - Implement user authentication
+- Add MCP tools to the Agent
+
