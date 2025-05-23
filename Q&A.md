@@ -6,9 +6,7 @@ Recently diagnosed breast cancer patients needing quick medical info and emotion
 
 High-contrast colors and large buttons for readability and ease of use
 
-Simple navigation to reduce stress during treatment
-
-Gentle language to avoid overwhelming users
+Simple navigation
 
 ### 3. Scaling to Production
 
