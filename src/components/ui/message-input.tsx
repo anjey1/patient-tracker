@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUp, Info, Loader2, Mic, Paperclip, Square } from 'lucide-react';
+import { omit } from 'remeda';
 
 import { cn } from '@/lib/utils';
 import { useAudioRecording } from '@/hooks/use-audio-recording';
@@ -209,6 +210,9 @@ export function MessageInput({
               showFileList && 'pb-16',
               className
             )}
+            {...(props.allowAttachments
+              ? omit(props, ['allowAttachments', 'files', 'setFiles'])
+              : omit(props, ['allowAttachments']))}
           />
 
           {props.allowAttachments && (
