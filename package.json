@@ -7,12 +7,12 @@
     "dev": "tsx server/index.ts",
     "build": "pnpm run build:client && pnpm run build:server",
     "build:client": "vite build",
-    "build:server": "tsc",
+    "build:server": "tsc -p tsconfig.node.json",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier . --write",
     "preview": "vite preview",
     "prepare": "husky",
-    "start": "node --experimental-specifier-resolution=node dist/server/index.js"
+    "start": "node dist/server/index.js"
   },
   "lint-staged": {
     "**/*": [
@@ -114,19 +114,6 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "lint-staged": "^15.2.2"
   },
-  "compilerOptions": {
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "strict": true,
-    "skipLibCheck": true,
-    "outDir": "./dist/server",
-    "resolveJsonModule": true
-  },
-  "include": [
-    "server/**/*.ts"
-  ],
   "exclude": [
     "node_modules"
   ]

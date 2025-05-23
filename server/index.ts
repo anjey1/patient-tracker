@@ -1,14 +1,14 @@
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
 import ViteExpress from 'vite-express';
 import { createGroq } from '@ai-sdk/groq';
-import { SYSTEM_PROMPT } from './ai-system';
+import { SYSTEM_PROMPT } from './ai-system.js';
 import rateLimit from 'express-rate-limit';
 import { streamText } from 'ai';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
 dotenv.config();
-const app = express();
+const app: Express = express();
 app.use(cors());
 app.use(express.json());
 
@@ -25,22 +25,26 @@ const limiter = rateLimit({
 
 app.use('/api/', limiter);
 
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({ status: 'All on board capitan' });
 });
 
-app.post('/api/chat', async (req, res) => {
+app.post('/api/chat', async (req: Request, res: Response) => {
   try {
     if (!req.body?.messages) {
-      return res.status(400).json({ error: 'Messages are required' });
+      res.status(400).json({ error: 'Messages are required' });
+      return;
     }
 
     const { messages, model = 'llama3-70b-8192' } = req.body;
-    const lastUserMessage = messages.findLast((msg) => msg.role === 'user');
+    const lastUserMessage = messages.findLast(
+      (msg: { role: string; content: string }) => msg.role === 'user'
+    );
     const prompt = lastUserMessage ? lastUserMessage.content : '';
 
     if (!prompt) {
-      return res.status(400).json({ error: 'Prompt is required' });
+      res.status(400).json({ error: 'Prompt is required' });
+      return;
     }
 
     const result = await streamText({
@@ -55,12 +59,16 @@ app.post('/api/chat', async (req, res) => {
       res.write(chunk);
     }
     res.end();
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Chat error:', error);
     res.status(500).json({
       error: 'An error occurred while processing your request',
       details:
-        process.env.NODE_ENV === 'development' ? error.message : undefined
+        process.env.NODE_ENV === 'development'
+          ? error instanceof Error
+            ? error.message
+            : String(error)
+          : undefined
     });
   }
 });
