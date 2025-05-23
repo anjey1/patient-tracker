@@ -1,4 +1,4 @@
-import { NavItem } from '@/types';
+import { NavItem, SymptomEntry } from '@/types';
 
 export const navItems: NavItem[] = [
   {
@@ -8,144 +8,174 @@ export const navItems: NavItem[] = [
     label: 'Dashboard'
   },
   {
-    title: 'Students',
-    href: '/student',
+    title: 'Chat',
+    href: '/ai',
     icon: 'user',
-    label: 'Student'
-  },
-  {
-    title: 'Login',
-    href: '/login',
-    icon: 'login',
-    label: 'Login'
+    label: 'Chat'
   }
 ];
 
-export const users = [
+// Patient Dashboard
+import { MoodEntry, Symptom, Task, Notification } from '../types';
+
+export const initialMoodHistory: MoodEntry[] = [
+  { date: '2023-11-11', moodValue: 2, moodLabel: 'Poor', emoji: '🙁' },
+  { date: '2023-11-12', moodValue: 3, moodLabel: 'Neutral', emoji: '😐' },
+  { date: '2023-11-13', moodValue: 3, moodLabel: 'Neutral', emoji: '😐' },
+  { date: '2023-11-14', moodValue: 4, moodLabel: 'Good', emoji: '🙂' },
+  { date: '2023-11-15', moodValue: 4, moodLabel: 'Good', emoji: '🙂' }
+];
+
+export const initialSymptoms: Symptom[] = [
+  {
+    id: 'headache',
+    name: 'Headache',
+    checked: false,
+    level: ''
+  },
+  {
+    id: 'fatigue',
+    name: 'Fatigue',
+    checked: true,
+    level: ''
+  },
+  {
+    id: 'nausea',
+    name: 'Nausea',
+    checked: false,
+    level: ''
+  },
+  {
+    id: 'dizziness',
+    name: 'Dizziness',
+    checked: true,
+    level: ''
+  },
+  {
+    id: 'insomnia',
+    name: 'Insomnia',
+    checked: false,
+    level: ''
+  }
+];
+
+export const initialTasks: Task[] = [
+  { id: 'meds-am', name: 'Take morning medication', completed: true },
+  { id: 'pt', name: 'Physical therapy exercises', completed: true },
+  { id: 'journal', name: 'Journal entry', completed: false },
+  { id: 'bp', name: 'Check blood pressure', completed: false },
+  { id: 'meds-pm', name: 'Evening medication', completed: false }
+];
+
+export const initialNotifications: Notification[] = [
   {
     id: 1,
-    name: 'Candice Schiner',
-    company: 'Dell',
-    role: 'Frontend Developer',
-    verified: false,
-    status: 'Active'
+    title: 'New message from your care team',
+    message: 'Dr. Smith sent you a message about your treatment plan.',
+    date: '2023-11-15T10:30:00',
+    read: false
   },
   {
     id: 2,
-    name: 'John Doe',
-    company: 'TechCorp',
-    role: 'Backend Developer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 3,
-    name: 'Alice Johnson',
-    company: 'WebTech',
-    role: 'UI Designer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 4,
-    name: 'David Smith',
-    company: 'Innovate Inc.',
-    role: 'Fullstack Developer',
-    verified: false,
-    status: 'Inactive'
-  },
-  {
-    id: 5,
-    name: 'Emma Wilson',
-    company: 'TechGuru',
-    role: 'Product Manager',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 6,
-    name: 'James Brown',
-    company: 'CodeGenius',
-    role: 'QA Engineer',
-    verified: false,
-    status: 'Active'
-  },
-  {
-    id: 7,
-    name: 'Laura White',
-    company: 'SoftWorks',
-    role: 'UX Designer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 8,
-    name: 'Michael Lee',
-    company: 'DevCraft',
-    role: 'DevOps Engineer',
-    verified: false,
-    status: 'Active'
-  },
-  {
-    id: 9,
-    name: 'Olivia Green',
-    company: 'WebSolutions',
-    role: 'Frontend Developer',
-    verified: true,
-    status: 'Active'
-  },
-  {
-    id: 10,
-    name: 'Robert Taylor',
-    company: 'DataTech',
-    role: 'Data Analyst',
-    verified: false,
-    status: 'Active'
+    title: 'Appointment reminder',
+    message: 'Your next appointment is tomorrow at 2:00 PM.',
+    date: '2023-11-14T09:15:00',
+    read: false
   }
 ];
 
-export const dashboardCard = [
-  {
-    date: 'Today',
-    total: 2000,
-    role: 'Students',
-    color: 'bg-[#EC4D61] bg-opacity-40'
-  },
-  {
-    date: 'Today',
-    total: 2000,
-    role: 'Teachers',
-    color: 'bg-[#FFEB95] bg-opacity-100'
-  },
-  {
-    date: 'Today',
-    total: 2000,
-    role: 'Parents',
-    color: 'bg-[#84BD47] bg-opacity-30'
-  },
-  {
-    date: 'Today',
-    total: 2000,
-    role: 'Schools',
-    color: 'bg-[#D289FF] bg-opacity-30'
-  }
+export const moodOptions = [
+  { emoji: '😢', label: 'Very poor', value: 1 },
+  { emoji: '🙁', label: 'Poor', value: 2 },
+  { emoji: '😐', label: 'Neutral', value: 3 },
+  { emoji: '🙂', label: 'Good', value: 4 },
+  { emoji: '😄', label: 'Excellent', value: 5 }
 ];
 
-export type Employee = {
-  id: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  gender: string;
-  date_of_birth: string; // Consider using a proper date type if possible
-  street: string;
-  city: string;
-  state: string;
-  country: string;
-  zipcode: string;
-  longitude?: number; // Optional field
-  latitude?: number; // Optional field
-  job: string;
-  profile_picture?: string | null; // Profile picture can be a string (URL) or null (if no picture)
-};
+export const initialSymptomHistory: SymptomEntry[] = [
+  {
+    date: '2023-11-11',
+    symptoms: [
+      {
+        id: 'headache',
+        name: 'Headache',
+        level: ''
+      }
+    ],
+    count: 1
+  },
+  {
+    date: '2023-11-12',
+    symptoms: [
+      {
+        id: 'headache',
+        name: 'Headache',
+        level: ''
+      },
+      {
+        id: 'fatigue',
+        name: 'Fatigue',
+        level: ''
+      },
+      {
+        id: 'dizziness',
+        name: 'Dizziness',
+        level: ''
+      }
+    ],
+    count: 3
+  },
+  {
+    date: '2023-11-13',
+    symptoms: [
+      {
+        id: 'fatigue',
+        name: 'Fatigue',
+        level: ''
+      },
+      {
+        id: 'dizziness',
+        name: 'Dizziness',
+        level: ''
+      }
+    ],
+    count: 2
+  },
+  {
+    date: '2023-11-14',
+    symptoms: [
+      {
+        id: 'headache',
+        name: 'Headache',
+        level: ''
+      },
+      {
+        id: 'fatigue',
+        name: 'Fatigue',
+        level: ''
+      },
+      {
+        id: 'nausea',
+        name: 'Nausea',
+        level: ''
+      }
+    ],
+    count: 3
+  },
+  {
+    date: '2023-11-15',
+    symptoms: [
+      {
+        id: 'fatigue',
+        name: 'Fatigue',
+        level: ''
+      },
+      {
+        id: 'dizziness',
+        name: 'Dizziness',
+        level: ''
+      }
+    ],
+    count: 2
+  }
+];

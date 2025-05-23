@@ -1,15 +1,18 @@
 {
-  "name": "react-shadcn-dashboard",
+  "name": "patient-tracker-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
+    "dev": "tsx server/index.ts",
+    "build": "pnpm run build:client && pnpm run build:server",
+    "build:client": "vite build",
+    "build:server": "tsc",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier . --write",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "husky",
+    "start": "node --experimental-specifier-resolution=node dist/server/index.js"
   },
   "lint-staged": {
     "**/*": [
@@ -17,6 +20,8 @@
     ]
   },
   "dependencies": {
+    "@ai-sdk/groq": "^1.2.9",
+    "@ai-sdk/react": "^1.2.12",
     "@eslint/config-array": "^0.19.0",
     "@eslint/object-schema": "^2.1.4",
     "@hookform/resolvers": "^3.3.4",
@@ -51,12 +56,18 @@
     "@tanstack/react-query": "^5.28.0",
     "@tanstack/react-query-devtools": "^5.28.0",
     "@tanstack/react-table": "^8.14.0",
+    "ai": "^4.3.16",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "cmdk": "^1.0.0",
+    "cors": "^2.8.5",
     "date-fns": "^3.6.0",
+    "dotenv": "^16.5.0",
     "embla-carousel-react": "^8.0.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "framer-motion": "^12.12.1",
     "input-otp": "^1.2.2",
     "lucide-react": "^0.358.0",
     "next-themes": "^0.3.0",
@@ -67,34 +78,56 @@
     "react-error-boundary": "^4.0.13",
     "react-helmet-async": "^2.0.4",
     "react-hook-form": "^7.51.1",
+    "react-markdown": "^10.1.0",
     "react-resizable-panels": "^2.0.13",
     "react-router-dom": "^6.22.3",
     "recharts": "^2.12.2",
+    "remark-gfm": "^4.0.1",
+    "remeda": "^2.21.8",
     "sonner": "^1.4.41",
     "tailwind-merge": "^2.2.2",
     "tailwindcss-animate": "^1.0.7",
     "use-debounce": "^10.0.0",
     "vaul": "^0.9.0",
-    "zod": "^3.22.4"
+    "vite-express": "^0.21.1",
+    "zod": "^3.22.4",
+    "vite": "^5.1.6",
+    "husky": "^9.0.11",
+    "tailwindcss": "^3.4.1",
+    "@vitejs/plugin-react-swc": "^3.5.0",
+    "postcss": "^8.4.35",
+    "prettier": "^3.2.5",
+    "prettier-plugin-tailwindcss": "^0.5.12",
+    "typescript": "^5.2.2"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.2",
     "@types/node": "^20.11.27",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
     "@typescript-eslint/eslint-plugin": "^7.1.1",
     "@typescript-eslint/parser": "^7.1.1",
-    "@vitejs/plugin-react-swc": "^3.5.0",
     "autoprefixer": "^10.4.18",
     "eslint": "^8.57.0",
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.5",
-    "husky": "^9.0.11",
-    "lint-staged": "^15.2.2",
-    "postcss": "^8.4.35",
-    "prettier": "^3.2.5",
-    "prettier-plugin-tailwindcss": "^0.5.12",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5.2.2",
-    "vite": "^5.1.6"
-  }
+    "lint-staged": "^15.2.2"
+  },
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist/server",
+    "resolveJsonModule": true
+  },
+  "include": [
+    "server/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

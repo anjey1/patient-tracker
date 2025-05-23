@@ -1,162 +1,180 @@
-import PageHead from '@/components/shared/page-head.jsx';
+import { useState, useEffect } from 'react';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+  MoodCard,
+  NotificationCard,
+  SymptomTrackerCard,
+  CareTasksCard
+} from '@/components/ui/patient-dashboard';
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger
-} from '@/components/ui/tabs.js';
-import RecentSales from './components/recent-sales.js';
+  initialMoodHistory,
+  initialSymptoms,
+  initialTasks,
+  initialNotifications,
+  moodOptions,
+  initialSymptomHistory
+} from '../../constants/data';
+import {
+  DashProps,
+  MoodEntry,
+  Symptom,
+  SymptomEntry,
+  Task,
+  Notification
+} from '../../types';
 
-export default function DashboardPage() {
+export default function Dash(props: DashProps) {
+  // Mood data and history
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const [moodHistory, setMoodHistory] = useState<MoodEntry[]>(
+    props.initialMoodHistory || initialMoodHistory
+  );
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Symptom tracker
+  const [symptomState, setSymptomState] = useState<Symptom[]>(
+    props.initialSymptoms || initialSymptoms
+  );
+  const [symptomHistory, setSymptomHistory] = useState<SymptomEntry[]>(
+    initialSymptomHistory
+  );
+
+  // Care tasks
+  const [tasks, setTasks] = useState<Task[]>(
+    props.initialTasks || initialTasks
+  );
+  const completedTasks = tasks.filter((task) => task.completed).length;
+  const taskProgress = (completedTasks / tasks.length) * 100;
+  const allTasksCompleted = tasks.length > 0 && completedTasks === tasks.length;
+
+  // Notifications
+  const [notifications, setNotifications] = useState<Notification[]>(
+    props.initialNotifications || initialNotifications
+  );
+
+  // Set today's mood if already logged
+  useEffect(() => {
+    const today = new Date().toISOString().split('T')[0];
+    const todayMood = moodHistory.find((entry) => entry.date === today);
+    if (todayMood) {
+      setSelectedMood(todayMood.moodValue);
+    }
+  }, [moodHistory]);
+
+  // Calculate mood statistics
+  const moodStats = moodHistory.reduce(
+    (acc, entry) => {
+      acc[entry.moodLabel] = (acc[entry.moodLabel] || 0) + 1;
+      return acc;
+    },
+    {} as Record<string, number>
+  );
+
+  // Calculate symptom leaderboard
+  const symptomLeaderboard = symptomHistory.reduce(
+    (acc, entry) => {
+      entry.symptoms.forEach((symptom) => {
+        acc[symptom.id] = acc[symptom.id] || { name: symptom.name, count: 0 };
+        acc[symptom.id].count += 1;
+      });
+      return acc;
+    },
+    {} as Record<string, { name: string; count: number }>
+  );
+
+  // Get last 5 mood entries including today
+  const recentMoodEntries = [...moodHistory]
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 5);
+
+  // Handlers
+  const handleMoodSelect = (value: number) => {
+    const today = new Date().toISOString().split('T')[0];
+    const mood = moodOptions.find((m) => m.value === value);
+
+    setSelectedMood(value);
+
+    const newHistory = moodHistory.filter((entry) => entry.date !== today);
+    setMoodHistory([
+      ...newHistory,
+      {
+        date: today,
+        moodValue: value,
+        moodLabel: mood?.label || '',
+        emoji: mood?.emoji || ''
+      }
+    ]);
+  };
+
+  const toggleSymptom = (id: string) => {
+    setSymptomState((prev) =>
+      prev.map((symptom) =>
+        symptom.id === id ? { ...symptom, checked: !symptom.checked } : symptom
+      )
+    );
+  };
+
+  const submitSymptoms = () => {
+    const today = new Date().toISOString().split('T')[0];
+    const selectedSymptoms = symptomState.filter((s) => s.checked);
+
+    const newHistory = symptomHistory.filter((entry) => entry.date !== today);
+    setSymptomHistory([
+      ...newHistory,
+      {
+        date: today,
+        symptoms: selectedSymptoms.map((s) => ({ id: s.id, name: s.name })),
+        count: selectedSymptoms.length
+      }
+    ]);
+  };
+
+  const toggleTask = (id: string) => {
+    setTasks((prev) =>
+      prev.map((task) =>
+        task.id === id ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  const markNotificationAsRead = (id: number) => {
+    setNotifications((prev) =>
+      prev.filter((notification) => notification.id !== id)
+    );
+  };
+
   return (
-    <>
-      <PageHead title="Dashboard | App" />
-      <div className="max-h-screen flex-1 space-y-4 overflow-y-auto p-4 pt-6 md:p-8">
-        <div className="flex items-center justify-between space-y-2">
-          <h2 className="text-3xl font-bold tracking-tight">
-            Hi, Welcome back 👋
-          </h2>
-        </div>
-        <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="analytics" disabled>
-              Analytics
-            </TabsTrigger>
-          </TabsList>
-          <TabsContent value="overview" className="space-y-4">
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Total Revenue
-                  </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">$45,231.89</div>
-                  <p className="text-xs text-muted-foreground">
-                    +20.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Subscriptions
-                  </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-                    <circle cx="9" cy="7" r="4" />
-                    <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">+2350</div>
-                  <p className="text-xs text-muted-foreground">
-                    +180.1% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Sales</CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <rect width="20" height="14" x="2" y="5" rx="2" />
-                    <path d="M2 10h20" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">+12,234</div>
-                  <p className="text-xs text-muted-foreground">
-                    +19% from last month
-                  </p>
-                </CardContent>
-              </Card>
-              <Card>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    Active Now
-                  </CardTitle>
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    className="h-4 w-4 text-muted-foreground"
-                  >
-                    <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-                  </svg>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">+573</div>
-                  <p className="text-xs text-muted-foreground">
-                    +201 since last hour
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-7">
-              <Card className="col-span-4">
-                <CardHeader>
-                  <CardTitle>Overview</CardTitle>
-                </CardHeader>
-                <CardContent className="pl-2">{/* <Overview /> */}</CardContent>
-              </Card>
-              <Card className="col-span-4 md:col-span-3">
-                <CardHeader>
-                  <CardTitle>Recent Sales</CardTitle>
-                  <CardDescription>
-                    You made 265 sales this month.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <RecentSales />
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
-    </>
+    <div className="grid h-full gap-4 overflow-y-auto p-0 md:grid-cols-2 lg:grid-cols-4">
+      <MoodCard
+        selectedMood={selectedMood}
+        moodHistory={moodHistory}
+        showHistory={showHistory}
+        recentMoodEntries={recentMoodEntries}
+        moodStats={moodStats}
+        moodOptions={moodOptions}
+        onMoodSelect={handleMoodSelect}
+        onToggleHistory={() => setShowHistory(!showHistory)}
+      />
+
+      <NotificationCard
+        notifications={notifications}
+        onMarkAsRead={markNotificationAsRead}
+      />
+
+      <SymptomTrackerCard
+        symptomState={symptomState}
+        symptomHistory={symptomHistory}
+        symptomLeaderboard={symptomLeaderboard}
+        onToggleSymptom={toggleSymptom}
+        onSubmitSymptoms={submitSymptoms}
+      />
+
+      <CareTasksCard
+        tasks={tasks}
+        completedTasks={completedTasks}
+        taskProgress={taskProgress}
+        allTasksCompleted={allTasksCompleted}
+        onToggleTask={toggleTask}
+      />
+    </div>
   );
 }
